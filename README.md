@@ -48,6 +48,10 @@ Colors in `styles.css` use semantic custom properties such as `--color-surface` 
 
 Typography and layout spacing use Utopia fluid tokens (`--text-*` and `--space-*`) that scale continuously between 360px and 1240px viewports. Reuse these tokens when adding components so new screens follow the same responsive rhythm.
 
+The interface uses Titillium Web from Google Fonts through the `--font-family-primary` token. System sans-serif fonts remain as fallbacks if the web font cannot load.
+
+Brand artwork lives under `assets/`. The page shell automatically switches between the supplied light and dark MGC logo variants with the selected theme.
+
 ## Privacy behavior
 
 - Answerers' names, notes, and progress use browser `localStorage` under the current event ID.

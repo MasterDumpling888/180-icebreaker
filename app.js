@@ -8,11 +8,8 @@ class Html {
   }
 
   static formatDate(dateString) {
-    return new Intl.DateTimeFormat("en-PH", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    }).format(new Date(`${dateString}T00:00:00`));
+    const [year, month, day] = dateString.split("-");
+    return `${month}/${day}/${year}`;
   }
 }
 
@@ -176,7 +173,7 @@ class ThemeManager {
     this.root.style.colorScheme = this.mode;
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       "content",
-      this.mode === "dark" ? "#181512" : "#fff5e5"
+      this.mode === "dark" ? "#3166a8" : "#d5cec8"
     );
   }
 }
@@ -214,8 +211,8 @@ class FamDinnerApp {
 
   themeControl() {
     return `<button class="theme-toggle" data-action="toggle-theme" aria-label="Switch to ${this.theme.nextMode} mode" title="Switch to ${this.theme.nextMode} mode">
-      <span aria-hidden="true">${this.theme.mode === "dark" ? "☀" : "☾"}</span>
-      <span>${this.theme.nextMode} mode</span>
+      <span class="theme-icon" aria-hidden="true">${this.theme.mode === "dark" ? "☼" : "☾"}</span>
+      <span class="sr-only">Switch to ${this.theme.nextMode} mode</span>
     </button>`;
   }
 
@@ -223,19 +220,21 @@ class FamDinnerApp {
     const { event } = this.config;
     const { state } = this.progress;
     this.root.innerHTML = `
-      ${this.themeControl()}
       <section class="panel welcome-panel">
-        <p class="eyebrow">A connection card for your table</p>
-        <h1>${Html.escape(event.title)}</h1>
-        <div class="event-meta">
+        <div class="panel-topbar">
           <span class="pill">${Html.escape(Html.formatDate(event.date))}</span>
-          <span class="pill">${Html.escape(event.topic)}</span>
+          ${this.themeControl()}
         </div>
+        <div class="welcome-heading">
+          <p class="event-title">${Html.escape(event.title)}</p>
+          <h1>${Html.escape(event.topic)}</h1>
+        </div>
+        <p class="game-label">Human Bingo</p>
         <p class="lede">${Html.escape(event.introduction)}</p>
         ${event.placeholderContent ? `<div class="notice placeholder-notice"><strong>Preview questions:</strong> These prompts are temporary and still need ministry-team approval before the event.</div>` : ""}
         <div class="notice"><strong>Your privacy:</strong> First names and optional notes stay in this browser and are never sent to 180 or MGC. Avoid adding sensitive details or pastoral-care information.</div>
         <div class="actions">
-          <button class="button button-primary" data-action="start">${state.started ? "Continue connecting" : "Start connecting"}</button>
+          <button class="button button-primary start-button" data-action="start"><span>${state.started ? "Continue connecting" : "Start connecting"}</span><span class="button-arrow" aria-hidden="true">››</span></button>
           ${state.started ? `<button class="button button-quiet" data-action="clear">Clear names, progress, and notes</button>` : ""}
         </div>
       </section>`;
@@ -247,10 +246,13 @@ class FamDinnerApp {
     if (completedCount === questions.length && !allowComplete) return this.renderCompletion();
 
     this.root.innerHTML = `
-      ${this.themeControl()}
       <section class="panel">
+        <div class="panel-topbar panel-topbar-game">
+          <span class="pill">${Html.escape(Html.formatDate(this.config.event.date))}</span>
+          ${this.themeControl()}
+        </div>
         <header class="game-header">
-          <div><p class="eyebrow">${Html.escape(this.config.event.title)}</p><h1>Choose a question</h1></div>
+          <div><p class="eyebrow">${Html.escape(this.config.event.title)}</p><h1>Complete the questions below!</h1></div>
           <div>
             <p class="progress-copy">${completedCount} of ${questions.length} conversations complete</p>
             <div class="progress-track" role="progressbar" aria-label="Card progress" aria-valuemin="0" aria-valuemax="${questions.length}" aria-valuenow="${completedCount}">
@@ -330,23 +332,31 @@ class FamDinnerApp {
 
   renderCompletion() {
     this.root.innerHTML = `
-      ${this.themeControl()}
       <section class="panel welcome-panel">
+        <div class="panel-topbar">${this.themeControl()}</div>
         <div class="completion-mark" aria-hidden="true">✓</div>
-        <p class="eyebrow">Card complete</p>
-        <h1>Great conversations start here.</h1>
-        <p class="lede">You finished all ${this.config.questions.length} prompts. Put the phone away and keep enjoying your table.</p>
+        <p class="eyebrow">Card complete!</p>
+        <h1>Great Job!</h1>
+        <p class="lede">You finished all ${this.config.questions.length} prompts. </br> We hope you were able to connect with your 180 family and make new friends! </p>
         <div class="actions">
           <button class="button button-secondary" data-action="review">Review my card</button>
           <button class="button button-quiet" data-action="clear">Clear names, progress, and notes</button>
         </div>
+           <a
+            class="button button-quiet"
+            href="https://mgc.org.ph"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Visit MGC website
+          </a>
       </section>`;
   }
 
   renderError(message) {
     this.root.innerHTML = `
-      ${this.themeControl()}
       <section class="panel welcome-panel">
+        <div class="panel-topbar">${this.themeControl()}</div>
         <p class="eyebrow">We couldn’t load the card</p>
         <h1>Please reconnect and try again.</h1>
         <p class="lede">The event questions may be temporarily unavailable. If this continues, ask a table leader for help.</p>
@@ -364,7 +374,7 @@ class FamDinnerApp {
       this.theme.toggle();
       target.setAttribute("aria-label", `Switch to ${this.theme.nextMode} mode`);
       target.setAttribute("title", `Switch to ${this.theme.nextMode} mode`);
-      target.innerHTML = `<span aria-hidden="true">${this.theme.mode === "dark" ? "☀" : "☾"}</span><span>${this.theme.nextMode} mode</span>`;
+      target.innerHTML = `<span class="theme-icon" aria-hidden="true">${this.theme.mode === "dark" ? "☼" : "☾"}</span><span class="sr-only">Switch to ${this.theme.nextMode} mode</span>`;
       return;
     }
     if (action === "start") {
