@@ -1,0 +1,27 @@
+{
+  "event": {
+    "id": "fam-dinner-2026-09-05",
+    "title": "180 FamDinner",
+    "date": "2026-09-05",
+    "topic": "September Connection Night",
+    "introduction": "Pick a card, ask someone at your table, and give each other room to share.",
+    "questionCount": 9,
+    "placeholderContent": true,
+    "messageDiscussionEnabled": false,
+    "mix": {
+      "icebreaker": 9,
+      "message_discussion": 0
+    }
+  },
+  "questions": [
+    { "id": "ice-001", "type": "icebreaker", "text": "What food could you happily eat every week?", "active": true, "displayOrder": 1 },
+    { "id": "ice-002", "type": "icebreaker", "text": "What is something good that happened to you recently?", "active": true, "displayOrder": 2 },
+    { "id": "ice-003", "type": "icebreaker", "text": "What hobby or skill would you like to learn?", "active": true, "displayOrder": 3 },
+    { "id": "ice-004", "type": "icebreaker", "text": "Where is one place you would love to visit?", "active": true, "displayOrder": 4 },
+    { "id": "ice-005", "type": "icebreaker", "text": "What song has been on repeat for you lately?", "active": true, "displayOrder": 5 },
+    { "id": "ice-006", "type": "icebreaker", "text": "What small thing reliably brightens your day?", "active": true, "displayOrder": 6 },
+    { "id": "ice-007", "type": "icebreaker", "text": "Who is a Bible character you would enjoy having dinner with?", "active": true, "displayOrder": 7 },
+    { "id": "ice-008", "type": "icebreaker", "text": "What is the best advice someone has given you?", "active": true, "displayOrder": 8 },
+    { "id": "ice-009", "type": "icebreaker", "text": "What are you looking forward to this month?", "active": true, "displayOrder": 9 }
+  ]
+}

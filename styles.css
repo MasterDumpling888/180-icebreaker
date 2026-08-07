@@ -1,0 +1,193 @@
+:root {
+  color-scheme: light;
+  --ink: #29241f;
+  --muted: #6f665e;
+  --paper: #fffdf8;
+  --cream: #fff5e5;
+  --peach: #f7caa8;
+  --coral: #d95f45;
+  --coral-dark: #a43c2d;
+  --sage: #59765c;
+  --sage-pale: #e6eee2;
+  --line: #dfd5c8;
+  --shadow: 0 18px 48px rgba(91, 61, 39, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 4%, rgba(247, 202, 168, 0.65), transparent 26rem),
+    radial-gradient(circle at 94% 88%, rgba(195, 216, 187, 0.7), transparent 28rem),
+    var(--cream);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+button, textarea { font: inherit; }
+button { touch-action: manipulation; }
+
+button:focus-visible, textarea:focus-visible {
+  outline: 3px solid #2d668f;
+  outline-offset: 3px;
+}
+
+.app-shell {
+  width: min(100% - 1.25rem, 58rem);
+  margin-inline: auto;
+  padding: 1.25rem 0 3rem;
+}
+
+.panel {
+  overflow: hidden;
+  padding: clamp(1.35rem, 4vw, 3rem);
+  border: 1px solid rgba(223, 213, 200, 0.85);
+  border-radius: 1.75rem;
+  background: rgba(255, 253, 248, 0.96);
+  box-shadow: var(--shadow);
+}
+
+.welcome-panel { margin-top: clamp(0.5rem, 6vh, 4rem); }
+.loading-panel { margin-top: 20vh; }
+.eyebrow, .type-label {
+  margin: 0 0 0.45rem;
+  color: var(--coral-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h1, h2, p { margin-top: 0; }
+h1 {
+  max-width: 14ch;
+  margin-bottom: 0.85rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.25rem, 9vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+h2 { font-size: clamp(1.45rem, 5vw, 2rem); line-height: 1.15; }
+.lede { max-width: 42rem; color: var(--muted); font-size: 1.08rem; }
+.event-meta { display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 1.25rem 0; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 99rem;
+  background: var(--sage-pale);
+  color: #36543a;
+  font-weight: 700;
+}
+
+.notice {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border-left: 4px solid var(--sage);
+  border-radius: 0.25rem 0.85rem 0.85rem 0.25rem;
+  background: var(--sage-pale);
+  color: #354538;
+}
+
+.placeholder-notice { border-left-color: var(--coral); background: #fff0e7; color: #713b2e; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1.4rem; }
+.button {
+  min-height: 3rem;
+  padding: 0.7rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: 0.85rem;
+  cursor: pointer;
+  font-weight: 800;
+}
+.button-primary { background: var(--coral); color: white; box-shadow: 0 7px 0 var(--coral-dark); }
+.button-primary:active { transform: translateY(3px); box-shadow: 0 4px 0 var(--coral-dark); }
+.button-secondary { border-color: var(--line); background: white; color: var(--ink); }
+.button-quiet { padding-inline: 0; background: transparent; color: var(--coral-dark); text-decoration: underline; }
+
+.game-header { display: grid; gap: 1rem; margin-bottom: 1.2rem; }
+.game-header h1 { max-width: none; margin-bottom: 0; font-size: clamp(2rem, 7vw, 3.5rem); }
+.progress-copy { margin-bottom: 0.35rem; color: var(--muted); font-weight: 700; }
+.progress-track { overflow: hidden; height: 0.65rem; border-radius: 99rem; background: #e9dfd2; }
+.progress-bar { height: 100%; border-radius: inherit; background: var(--sage); transition: width 180ms ease; }
+
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+.prompt-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0.65rem;
+  border: 2px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: center;
+  font-size: clamp(0.7rem, 2.7vw, 1rem);
+  font-weight: 750;
+  line-height: 1.25;
+}
+.prompt-tile:hover { border-color: var(--coral); }
+.prompt-tile.is-complete { border-color: var(--sage); background: var(--sage-pale); color: #29472e; }
+.prompt-tile.is-complete::after { content: "✓"; position: absolute; top: 0.28rem; right: 0.42rem; font-weight: 900; }
+.prompt-tile.is-discussion { background: #fff1e6; }
+.prompt-tile.is-complete.is-discussion { background: var(--sage-pale); }
+
+.game-footer { display: flex; justify-content: space-between; gap: 1rem; align-items: center; margin-top: 1.2rem; }
+.game-tip { margin: 0; color: var(--muted); font-size: 0.93rem; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: end center;
+  padding: 1rem;
+  background: rgba(41, 36, 31, 0.62);
+}
+.prompt-dialog {
+  width: min(100%, 36rem);
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 1.4rem;
+  border: 0;
+  border-radius: 1.4rem;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+.question-text { margin-bottom: 1.2rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.12; }
+label { display: block; margin-bottom: 0.45rem; font-weight: 800; }
+.help-text { color: var(--muted); font-size: 0.86rem; }
+textarea {
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.8rem;
+  resize: vertical;
+  border: 2px solid var(--line);
+  border-radius: 0.75rem;
+  background: white;
+  color: var(--ink);
+}
+.completion-mark { width: 4.5rem; height: 4.5rem; display: grid; place-items: center; margin-bottom: 1rem; border-radius: 50%; background: var(--sage-pale); color: var(--sage); font-size: 2.3rem; font-weight: 900; }
+.error-details { color: var(--muted); font-size: 0.9rem; }
+.noscript { margin: 1rem; padding: 1rem; background: white; }
+
+@media (min-width: 700px) {
+  .app-shell { padding-top: 2rem; }
+  .game-header { grid-template-columns: 1fr 18rem; align-items: end; }
+  .card-grid { gap: 1rem; }
+  .prompt-tile { padding: 1rem; }
+  .modal-backdrop { place-items: center; }
+  .prompt-dialog { padding: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}

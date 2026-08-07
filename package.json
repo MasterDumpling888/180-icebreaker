@@ -1,0 +1,11 @@
+{
+  "name": "180-famdinner-connection-game",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "validate": "node scripts/validate-event.mjs",
+    "test": "npm run validate"
+  }
+}
