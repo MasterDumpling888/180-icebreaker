@@ -34,6 +34,20 @@ The validator prints a warning while placeholder content remains. It rejects inc
 
 The included workflow validates `event.json` before each deployment.
 
+## Code structure and themes
+
+The browser application is split into small classes in `app.js`:
+
+- `EventConfiguration` loads and validates event content.
+- `ProgressStore` owns device-local names, notes, and completion state.
+- `ThemeManager` follows the device theme and remembers a light or dark preference.
+- `FamDinnerApp` coordinates screens and attendee interactions.
+- `Html` contains safe display-formatting helpers.
+
+Colors in `styles.css` use semantic custom properties such as `--color-surface` and `--color-text`. Light values live under `:root`; dark values override the same tokens under `:root[data-theme="dark"]`. Components should use these tokens instead of adding direct color values.
+
+Typography and layout spacing use Utopia fluid tokens (`--text-*` and `--space-*`) that scale continuously between 360px and 1240px viewports. Reuse these tokens when adding components so new screens follow the same responsive rhythm.
+
 ## Privacy behavior
 
 - Answerers' names, notes, and progress use browser `localStorage` under the current event ID.
