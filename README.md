@@ -1,6 +1,6 @@
 # 180 FamDinner Connection Game
 
-A mobile-first, static conversation card for 180 FamDinner. It uses no backend, accounts, analytics, or shared response collection. Optional notes and progress stay in the attendee's browser.
+A mobile-first, static conversation card for 180 FamDinner. It uses no backend, accounts, analytics, or shared response collection. Answerers' first names, optional notes, and progress stay in the attendee's browser.
 
 ## Preview locally
 
@@ -36,7 +36,7 @@ The included workflow validates `event.json` before each deployment.
 
 ## Privacy behavior
 
-- Notes and progress use browser `localStorage` under the current event ID.
+- Answerers' names, notes, and progress use browser `localStorage` under the current event ID.
 - Nothing typed into the app is submitted to 180, MGC, GitHub, or another service.
-- “Clear my progress and notes” removes the current event's stored data from that browser.
+- “Clear names, progress, and notes” removes the current event's stored data from that browser.
 - Clearing browser storage or using another browser/device results in separate progress.

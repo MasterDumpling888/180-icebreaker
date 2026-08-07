@@ -9,14 +9,20 @@ function storageKey() {
 }
 
 function emptyState() {
-  return { started: false, completed: [], notes: {} };
+  return { started: false, completed: [], notes: {}, answerers: {} };
 }
 
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey()));
     if (!saved || !Array.isArray(saved.completed) || typeof saved.notes !== "object") return emptyState();
-    return { started: Boolean(saved.started), completed: saved.completed, notes: saved.notes ?? {} };
+    const answerers = saved.answerers && typeof saved.answerers === "object" ? saved.answerers : {};
+    return {
+      started: Boolean(saved.started),
+      completed: saved.completed.filter(questionId => answerers[questionId]?.trim()),
+      notes: saved.notes ?? {},
+      answerers
+    };
   } catch {
     return emptyState();
   }
@@ -51,10 +57,10 @@ function renderWelcome() {
       </div>
       <p class="lede">${escapeHtml(event.introduction)}</p>
       ${event.placeholderContent ? `<div class="notice placeholder-notice"><strong>Preview questions:</strong> These prompts are temporary and still need ministry-team approval before the event.</div>` : ""}
-      <div class="notice"><strong>Your privacy:</strong> Optional notes stay in this browser and are never sent to 180 or MGC. Avoid entering sensitive, identifying, or pastoral-care information.</div>
+      <div class="notice"><strong>Your privacy:</strong> First names and optional notes stay in this browser and are never sent to 180 or MGC. Avoid adding sensitive details or pastoral-care information.</div>
       <div class="actions">
         <button class="button button-primary" data-action="start">${state.started ? "Continue connecting" : "Start connecting"}</button>
-        ${state.started ? `<button class="button button-quiet" data-action="clear">Clear my progress and notes</button>` : ""}
+        ${state.started ? `<button class="button button-quiet" data-action="clear">Clear names, progress, and notes</button>` : ""}
       </div>
     </section>`;
 }
@@ -78,7 +84,8 @@ function renderGame({ allowComplete = false } = {}) {
         ${questions.map(question => `
           <button class="prompt-tile ${question.type === "message_discussion" ? "is-discussion" : ""} ${state.completed.includes(question.id) ? "is-complete" : ""}"
             data-question-id="${escapeHtml(question.id)}" aria-pressed="${state.completed.includes(question.id)}">
-            ${escapeHtml(question.text)}
+            <span class="tile-question">${escapeHtml(question.text)}</span>
+            ${state.answerers[question.id] ? `<span class="answered-by">Answered by ${escapeHtml(state.answerers[question.id])}</span>` : ""}
           </button>`).join("")}
       </div>
       <footer class="game-footer">
@@ -99,6 +106,10 @@ function openQuestion(questionId) {
     <section class="prompt-dialog" role="dialog" aria-modal="true" aria-labelledby="prompt-title">
       <p class="type-label">${question.type === "message_discussion" ? "Message discussion" : "Icebreaker"}</p>
       <h2 class="question-text" id="prompt-title">${escapeHtml(question.text)}</h2>
+      <label for="answerer-name">Who answered?</label>
+      <input id="answerer-name" type="text" maxlength="60" autocomplete="off" placeholder="First name" value="${escapeHtml(state.answerers[questionId] ?? "")}" aria-describedby="name-help name-error">
+      <p class="help-text" id="name-help">Enter the name they’d like you to remember.</p>
+      <p class="field-error" id="name-error" role="alert" hidden>Please enter the person’s name.</p>
       <label for="private-note">Private note <span class="help-text">(optional)</span></label>
       <textarea id="private-note" maxlength="500" placeholder="A short reminder for yourself…">${escapeHtml(state.notes[questionId] ?? "")}</textarea>
       <p class="help-text">Saved only in this browser. Please don’t enter sensitive or identifying information.</p>
@@ -109,7 +120,7 @@ function openQuestion(questionId) {
       </div>
     </section>`;
   document.body.append(backdrop);
-  backdrop.querySelector("textarea").focus();
+  backdrop.querySelector("#answerer-name").focus();
 }
 
 function closeQuestion() {
@@ -117,10 +128,22 @@ function closeQuestion() {
   activeQuestionId = null;
 }
 
-function saveActiveNote() {
+function saveActiveResponse({ requireName = false } = {}) {
+  const nameInput = document.querySelector("#answerer-name");
+  const name = nameInput?.value.trim() ?? "";
+  const error = document.querySelector("#name-error");
+  if (requireName && !name) {
+    error.hidden = false;
+    nameInput.setAttribute("aria-invalid", "true");
+    nameInput.focus();
+    return false;
+  }
+  if (name) state.answerers[activeQuestionId] = name;
+  else delete state.answerers[activeQuestionId];
   const note = document.querySelector("#private-note")?.value.trim() ?? "";
   if (note) state.notes[activeQuestionId] = note;
   else delete state.notes[activeQuestionId];
+  return true;
 }
 
 function renderCompletion() {
@@ -132,7 +155,7 @@ function renderCompletion() {
       <p class="lede">You finished all ${activeQuestions().length} prompts. Put the phone away and keep enjoying your table.</p>
       <div class="actions">
         <button class="button button-secondary" data-action="review">Review my card</button>
-        <button class="button button-quiet" data-action="clear">Clear my progress and notes</button>
+        <button class="button button-quiet" data-action="clear">Clear names, progress, and notes</button>
       </div>
     </section>`;
 }
@@ -186,16 +209,16 @@ document.addEventListener("click", event => {
   if (action === "retry") initialize();
   if (action === "close-question") closeQuestion();
   if (action === "complete-question") {
-    saveActiveNote();
+    if (!saveActiveResponse({ requireName: true })) return;
     if (!state.completed.includes(activeQuestionId)) state.completed.push(activeQuestionId);
     saveState(); closeQuestion(); renderGame();
   }
   if (action === "undo-question") {
-    saveActiveNote();
+    saveActiveResponse();
     state.completed = state.completed.filter(id => id !== activeQuestionId);
     saveState(); closeQuestion(); renderGame();
   }
-  if (action === "clear" && window.confirm("Clear all progress and private notes for this event on this browser?")) {
+  if (action === "clear" && window.confirm("Clear all names, progress, and private notes for this event on this browser?")) {
     try { localStorage.removeItem(storageKey()); } catch { /* Nothing else to clear. */ }
     state = emptyState(); renderWelcome();
   }

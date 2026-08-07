@@ -28,10 +28,10 @@ body {
   line-height: 1.5;
 }
 
-button, textarea { font: inherit; }
+button, input, textarea { font: inherit; }
 button { touch-action: manipulation; }
 
-button:focus-visible, textarea:focus-visible {
+button:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 3px solid #2d668f;
   outline-offset: 3px;
 }
@@ -134,6 +134,14 @@ h2 { font-size: clamp(1.45rem, 5vw, 2rem); line-height: 1.15; }
   font-weight: 750;
   line-height: 1.25;
 }
+.tile-question { display: block; }
+.answered-by {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--sage);
+  font-size: 0.72em;
+  font-weight: 850;
+}
 .prompt-tile:hover { border-color: var(--coral); }
 .prompt-tile.is-complete { border-color: var(--sage); background: var(--sage-pale); color: #29472e; }
 .prompt-tile.is-complete::after { content: "✓"; position: absolute; top: 0.28rem; right: 0.42rem; font-weight: 900; }
@@ -165,16 +173,20 @@ h2 { font-size: clamp(1.45rem, 5vw, 2rem); line-height: 1.15; }
 .question-text { margin-bottom: 1.2rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.12; }
 label { display: block; margin-bottom: 0.45rem; font-weight: 800; }
 .help-text { color: var(--muted); font-size: 0.86rem; }
+input,
 textarea {
   width: 100%;
-  min-height: 6rem;
   padding: 0.8rem;
-  resize: vertical;
   border: 2px solid var(--line);
   border-radius: 0.75rem;
   background: white;
   color: var(--ink);
 }
+input { min-height: 3rem; }
+textarea { min-height: 6rem; resize: vertical; }
+#private-note { margin-top: 0.35rem; }
+.field-error { margin: 0.35rem 0 0.85rem; color: #9d3026; font-size: 0.88rem; font-weight: 800; }
+input[aria-invalid="true"] { border-color: #b63f32; }
 .completion-mark { width: 4.5rem; height: 4.5rem; display: grid; place-items: center; margin-bottom: 1rem; border-radius: 50%; background: var(--sage-pale); color: var(--sage); font-size: 2.3rem; font-weight: 900; }
 .error-details { color: var(--muted); font-size: 0.9rem; }
 .noscript { margin: 1rem; padding: 1rem; background: white; }
