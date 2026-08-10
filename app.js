@@ -132,6 +132,18 @@ class ProgressStore {
   }
 }
 
+class IOSViewportManager {
+  static stabilizeFormFocus() {
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (!isIOSDevice) return;
+
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport || viewport.content.includes("maximum-scale")) return;
+    viewport.content = `${viewport.content}, maximum-scale=1`;
+  }
+}
+
 class ThemeManager {
   constructor(root = document.documentElement, storage = window.localStorage) {
     this.root = root;
@@ -189,6 +201,7 @@ class FamDinnerApp {
     this.eventsBound = false;
     this.handleClick = this.handleClick.bind(this);
     this.handleKeydown = this.handleKeydown.bind(this);
+    IOSViewportManager.stabilizeFormFocus();
   }
 
   async initialize() {
@@ -306,12 +319,19 @@ class FamDinnerApp {
         </div>
       </section>`;
     document.body.append(backdrop);
-    backdrop.querySelector("#answerer-name").focus();
   }
 
   closeQuestion() {
-    document.querySelector("[data-modal]")?.remove();
+    const backdrop = document.querySelector("[data-modal]");
+    if (backdrop?.contains(document.activeElement)) document.activeElement.blur();
+    backdrop?.remove();
     this.activeQuestionId = null;
+    window.requestAnimationFrame(() => {
+      this.root.scrollLeft = 0;
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
+      window.scrollTo(0, window.scrollY);
+    });
   }
 
   readActiveResponse({ requireName = false } = {}) {
@@ -334,8 +354,10 @@ class FamDinnerApp {
     this.root.innerHTML = `
       <section class="panel welcome-panel">
         <div class="panel-topbar">${this.themeControl()}</div>
+        <div class="completion-header">
         <div class="completion-mark" aria-hidden="true">✓</div>
         <p class="eyebrow">Card complete!</p>
+        </div>
         <h1>Great Job!</h1>
         <p class="lede">You finished all ${this.config.questions.length} prompts. </br> We hope you were able to connect with your 180 family and make new friends! </p>
         <div class="actions">

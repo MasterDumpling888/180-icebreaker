@@ -97,7 +97,14 @@
 }
 
 * { box-sizing: border-box; }
-main { display: flex; flex: 1; flex-direction: column; }
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+main { display: flex; min-height: 0; flex: 1; flex-direction: column; }
 
 body {
   display: grid;
@@ -123,6 +130,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .app-shell {
   width: min(100% - var(--space-s), 58rem);
+  max-width: 100%;
   margin-inline: auto;
   padding: 0 var(--space-2xs) var(--space-l);
   position: relative;
@@ -130,8 +138,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 }
 
 .panel {
-  overflow: hidden;
-  padding: var(--space-s-l);
+  overflow: visible;
+  padding: var(--space-m);
   width: 100%;
   border: 0;
   border-radius: var(--space-m-l);
@@ -263,6 +271,7 @@ h2 { font-size: var(--text-2); line-height: 1.15; }
   display: grid;
   place-items: center center;
   padding: var(--space-xs);
+  overflow-x: hidden;
   background: var(--color-overlay);
 }
 .prompt-dialog {
@@ -295,6 +304,8 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
 .completion-mark { justify-self:center; width: var(--space-xl); height: var(--space-xl); display: grid; place-items: center; margin-bottom: var(--space-xs); border-radius: 50%; border: 2px solid var(--color-positive); background: var(--color-positive-surface); color: var(--color-positive); font-size: var(--text-2); font-weight: 600; }
 .error-details { color: var(--color-text-muted); font-size: var(--text--2); }
 .noscript { margin: var(--space-xs); padding: var(--space-xs); background: var(--color-surface); }
+
+.completion-header{ display:flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;}
 
 .sr-only {
   position: absolute;
@@ -347,7 +358,7 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
 }
 
 .theme-icon { font-size: var(--text-1); font-weight: 300; line-height: 1; }
-.welcome-panel { text-align: center; }
+.welcome-panel { text-align: center; justify-content: center; }
 .welcome-heading { margin-bottom: var(--space-l-xl); }
 .event-title { margin-bottom: var(--space-3xs); color: var(--color-text-muted); font-size: var(--text-0); }
 .welcome-heading h1 { max-width: 12ch; margin-inline: auto; margin-bottom: var(--space-l); color: var(--color-text); font-size: var(--text-5)}
@@ -423,7 +434,7 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
 :root[data-theme="dark"] .oneeighty-logo-light { display: none; }
 :root[data-theme="dark"] .oneeighty-logo-dark { display: block; }
 
-@media (max-width: 699px) {
+@media (max-width: 800px) {
   body {
     height: 100dvh;
     overflow: hidden;
@@ -436,23 +447,28 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
 
   .app-shell {
     width: min(100% - var(--space-s), 36rem);
+    height: 100%;
+    max-height: 100%;
     min-height: 0;
-    padding: 0 var(--space-3xs) var(--space-3xs);
+    padding: 0 var(--space-3xs) var(--space-s);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    scroll-padding-bottom: var(--space-s);
     scrollbar-width: thin;
+    justify-content: center;
   }
 
-  .panel {
-    min-height: 100%;
-    padding: var(--space-s);
-    border-radius: var(--space-m-l);
+  .panel { min-height: min-content; padding: var(--space-xs); }
+  .game-footer { padding-bottom: var(--space-3xs); }
+
+  input,
+  textarea {
+    font-size: 16px;
   }
 
-  /* .panel-topbar {
-    min-height: var(--space-l);
-    margin-bottom: var(--space-2xl);
-  } */
+  .panel-topbar { margin-bottom: var(--space-2xs); }
+  .panel-topbar-game { margin-bottom: var(--space-2xs); }
 
   .theme-toggle {
     width: var(--space-l);
@@ -467,39 +483,20 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
   .welcome-panel .actions { margin-top: var(--space-2xs); }
   .start-button { min-height: var(--space-l); padding-block: var(--space-3xs); font-size: var(--text--1); }
 
+  .game-header { gap: var(--space-3xs); margin-bottom: var(--space-2xs); }
+  .game-header h1 { font-size: var(--text-2); }
+  .progress-copy { font-size: var(--text--2); }
+  .card-grid { gap: var(--space-3xs); }
+  .prompt-tile { padding: var(--space-3xs); font-size: var(--text--2); }
+  .game-footer { gap: var(--space-2xs); margin-top: var(--space-2xs); }
+  .game-footer .button { min-height: var(--space-m); padding: var(--space-3xs) var(--space-2xs); }
+
   .site-footer { min-height: 0; }
   .footer-cta { width: min(78vw, 20rem); margin-top: var(--space-2xs); }
-  .footer-wave { min-height: var(--space-xl); }
+  .footer-wave { min-height: var(--space-l); }
   .mgc-logo { width: var(--space-l); }
 }
 
-@media (max-width: 699px) and (max-height: 720px) {
-  .site-header { padding-block: var(--space-3xs); }
-  .oneeighty-logo { width: var(--space-m); }
-  .panel { padding: var(--space-2xs); }
-  .panel-topbar { min-height: var(--space-m); margin-bottom: var(--space-3xs); }
-  .theme-toggle { width: var(--space-m); min-height: var(--space-m); }
-  .welcome-heading { margin-bottom: var(--space-2xs); }
-  .event-title, .game-label { font-size: var(--text--2); }
-  .welcome-panel .lede { font-size: var(--text--2); }
-  .welcome-panel .notice { margin-block: var(--space-3xs); padding: var(--space-3xs-2xs); font-size: var(--text--2); }
-  .welcome-panel .actions { margin-top: var(--space-3xs); }
-  .start-button { min-height: var(--space-m); font-size: var(--text--2); }
-  .footer-cta { width: min(68vw, 17rem); }
-  .footer-wave { min-height: var(--space-l); }
-  .mgc-logo { width: var(--space-m); }
-}
-
-@media (min-width: 700px) {
-  .app-shell { padding: 0 var(--space-s) var(--space-xl); }
-  .panel { max-width: 54rem; margin-inline: auto; }
-  .site-header { min-height: var(--space-2xl); }
-  .game-header { grid-template-columns: 1fr 18rem; align-items: end; }
-  .card-grid { gap: var(--space-xs); }
-  .prompt-tile { padding: var(--space-xs); }
-  .modal-backdrop { place-items: center; }
-  .prompt-dialog { padding: var(--space-m); }
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
