@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "180-icebreaker-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-11",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "180-icebreaker-responses",
+      "database_id": "78fcb0fc-e492-4a60-a260-e5e127f066a0",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:8000,https://masterdumpling888.github.io"
+  },
+  "triggers": {
+    "crons": ["0 * * * *"]
+  }
+}

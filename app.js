@@ -40,6 +40,12 @@ class EventConfiguration {
     if (event.subheader !== undefined && typeof event.subheader !== "string") {
       throw new Error("The event subheader must be text.");
     }
+    const collection = event.responseCollection;
+    if (collection?.enabled && (
+      typeof collection.apiBaseUrl !== "string"
+      || !Number.isInteger(collection.maxLength)
+      || Number.isNaN(Date.parse(collection.expiresAt))
+    )) throw new Error("The anonymous response settings are incomplete.");
     if (!Array.isArray(questions)) throw new Error("The question list is missing.");
 
     const active = questions.filter(question => question.active);
@@ -135,6 +141,75 @@ class ProgressStore {
   }
 }
 
+class AnonymousResponseStore {
+  constructor(eventId, storage = window.localStorage) {
+    this.key = `180-famdinner:shared-responses:${eventId}`;
+    this.storage = storage;
+    this.state = this.#load();
+  }
+
+  #load() {
+    try {
+      const saved = JSON.parse(this.storage.getItem(this.key));
+      return saved && typeof saved === "object" ? { drafts: saved.drafts ?? {}, submissions: saved.submissions ?? {} } : { drafts: {}, submissions: {} };
+    } catch {
+      return { drafts: {}, submissions: {} };
+    }
+  }
+
+  save() {
+    try { this.storage.setItem(this.key, JSON.stringify(this.state)); } catch { /* Retry remains available for this visit. */ }
+  }
+
+  queue(questionId, text) {
+    const existing = this.state.submissions[questionId];
+    this.state.drafts[questionId] = text;
+    this.state.submissions[questionId] = {
+      id: existing?.id ?? (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`),
+      text,
+      status: "pending"
+    };
+    this.save();
+  }
+
+  markSubmitted(questionId) {
+    const submission = this.state.submissions[questionId];
+    if (!submission) return;
+    submission.status = "submitted";
+    delete this.state.drafts[questionId];
+    this.save();
+  }
+
+  clear() {
+    try { this.storage.removeItem(this.key); } catch { /* Nothing else to clear. */ }
+    this.state = { drafts: {}, submissions: {} };
+  }
+}
+
+class ResponseApi {
+  constructor(config) {
+    this.config = config;
+    this.baseUrl = config?.apiBaseUrl?.replace(/\/$/, "") ?? "";
+  }
+
+  get available() {
+    return Boolean(this.config?.enabled && this.baseUrl && !this.baseUrl.includes("YOUR-SUBDOMAIN"));
+  }
+
+  async submit({ submissionId, eventId, questionId, response }) {
+    if (!this.available) throw new Error("Anonymous response collection has not been connected yet.");
+    const result = await fetch(`${this.baseUrl}/v1/responses`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ submissionId, eventId, questionId, response })
+    });
+    if (!result.ok) {
+      const body = await result.json().catch(() => ({}));
+      throw new Error(body.error ?? "The anonymous response could not be sent.");
+    }
+  }
+}
+
 class IOSViewportManager {
   static stabilizeFormFocus() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -212,6 +287,8 @@ class FamDinnerApp {
     try {
       this.config = await EventConfiguration.load(this.eventUrl);
       this.progress = new ProgressStore(this.config.event.id);
+      this.responses = new AnonymousResponseStore(this.config.event.id);
+      this.responseApi = new ResponseApi(this.config.event.responseCollection);
       this.renderWelcome();
     } catch (error) {
       this.renderError(error instanceof Error ? error.message : "Unknown error");
@@ -249,7 +326,7 @@ class FamDinnerApp {
         <p class="game-label">Human Bingo</p>
         <p class="lede">${Html.escape(event.introduction)}</p>
         ${event.placeholderContent ? `<div class="notice placeholder-notice"><strong>Preview questions:</strong> These prompts are temporary and still need ministry-team approval before the event.</div>` : ""}
-        <div class="notice"><strong>Your privacy:</strong> First names and optional notes stay in this browser and are never sent to 180 or MGC. Avoid adding sensitive details or pastoral-care information.</div>
+        <div class="notice"><strong>Your privacy:</strong> First names and private notes stay in this browser. Only text entered in the clearly marked anonymous response field is sent to the event team. Avoid sensitive details or pastoral-care information.</div>
         <div class="actions">
           <button class="button button-primary start-button" data-action="start"><span>${state.started ? "Continue connecting" : "Start connecting"}</span><span class="button-arrow" aria-hidden="true">››</span></button>
           ${state.started ? `<button class="button button-quiet" data-action="clear">Clear names, progress, and notes</button>` : ""}
@@ -290,11 +367,13 @@ class FamDinnerApp {
   renderQuestionTile(question) {
     const isComplete = this.progress.isComplete(question.id);
     const answerer = this.progress.state.answerers[question.id];
+    const submission = this.responses.state.submissions[question.id];
     return `
       <button class="prompt-tile ${question.type === "message_discussion" ? "is-discussion" : ""} ${isComplete ? "is-complete" : ""}"
         data-question-id="${Html.escape(question.id)}" aria-pressed="${isComplete}">
         <span class="tile-question">${Html.escape(question.text)}</span>
         ${answerer ? `<span class="answered-by">Answered by ${Html.escape(answerer)}</span>` : ""}
+        ${submission ? `<span class="shared-status">${submission.status === "submitted" ? "Anonymous response sent" : "Response waiting to retry"}</span>` : ""}
       </button>`;
   }
 
@@ -302,6 +381,9 @@ class FamDinnerApp {
     const question = this.config.findQuestion(questionId);
     if (!question) return;
     this.activeQuestionId = questionId;
+    const collection = this.config.event.responseCollection;
+    const priorSubmission = this.responses.state.submissions[questionId];
+    const sharedValue = this.responses.state.drafts[questionId] ?? priorSubmission?.text ?? "";
     const backdrop = document.createElement("div");
     backdrop.className = "modal-backdrop";
     backdrop.dataset.modal = "true";
@@ -316,6 +398,13 @@ class FamDinnerApp {
         <label for="private-note">Private note <span class="help-text">(optional)</span></label>
         <textarea id="private-note" maxlength="500" placeholder="A short reminder for yourself…">${Html.escape(this.progress.state.notes[questionId] ?? "")}</textarea>
         <p class="help-text">Saved only in this browser. Please don’t enter sensitive or identifying information.</p>
+        ${collection?.enabled ? `
+          <div class="shared-response-field">
+            <label for="shared-response">Anonymous response for the event team <span class="help-text">(optional)</span></label>
+            <textarea id="shared-response" maxlength="${collection.maxLength}" placeholder="A short answer officers may include in the event results…">${Html.escape(sharedValue)}</textarea>
+            <p class="help-text">This response is sent without the name or private note above. It will be reviewed before it is shown.</p>
+            ${priorSubmission?.status === "submitted" ? `<p class="submission-status is-success">Your anonymous response was sent. Saving changes will update that submission.</p>` : ""}
+          </div>` : ""}
         <div class="actions">
           <button class="button button-primary" data-action="complete-question">${this.progress.isComplete(questionId) ? "Save response" : "Mark conversation complete"}</button>
           ${this.progress.isComplete(questionId) ? `<button class="button button-secondary" data-action="undo-question">Mark incomplete</button>` : ""}
@@ -350,8 +439,26 @@ class FamDinnerApp {
     }
     return {
       answerer,
-      note: document.querySelector("#private-note")?.value.trim() ?? ""
+      note: document.querySelector("#private-note")?.value.trim() ?? "",
+      sharedResponse: document.querySelector("#shared-response")?.value.trim() ?? ""
     };
+  }
+
+  async submitAnonymousResponse(questionId, text) {
+    if (!text) return;
+    this.responses.queue(questionId, text);
+    const submission = this.responses.state.submissions[questionId];
+    try {
+      await this.responseApi.submit({
+        submissionId: submission.id,
+        eventId: this.config.event.id,
+        questionId,
+        response: submission.text
+      });
+      this.responses.markSubmitted(questionId);
+    } catch (error) {
+      console.warn(error instanceof Error ? error.message : error);
+    }
   }
 
   renderCompletion() {
@@ -391,7 +498,7 @@ class FamDinnerApp {
       </section>`;
   }
 
-  handleClick(event) {
+  async handleClick(event) {
     const target = event.target.closest("button");
     if (!target) return;
     const { action } = target.dataset;
@@ -414,7 +521,14 @@ class FamDinnerApp {
     if (action === "complete-question") {
       const response = this.readActiveResponse({ requireName: true });
       if (!response) return;
-      this.progress.complete(this.activeQuestionId, response);
+      const questionId = this.activeQuestionId;
+      this.progress.complete(questionId, response);
+      const button = target;
+      if (response.sharedResponse) {
+        button.disabled = true;
+        button.textContent = "Saving…";
+        await this.submitAnonymousResponse(questionId, response.sharedResponse);
+      }
       this.closeQuestion();
       return this.renderGame();
     }
@@ -426,6 +540,7 @@ class FamDinnerApp {
     }
     if (action === "clear" && window.confirm("Clear all names, progress, and private notes for this event on this browser?")) {
       this.progress.clear();
+      this.responses.clear();
       return this.renderWelcome();
     }
   }

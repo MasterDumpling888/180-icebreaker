@@ -122,6 +122,7 @@ body {
 
 button, input, textarea { font: inherit; }
 button { touch-action: manipulation; }
+button:disabled { cursor: not-allowed; opacity: .55; }
 
 button:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 3px solid var(--color-focus);
@@ -255,6 +256,7 @@ h2 { font-size: var(--text-2); line-height: 1.15; }
   font-size: 0.72em;
   font-weight: 400;
 }
+.shared-status { display: block; margin-top: var(--space-3xs); color: var(--color-text-muted); font-size: .68em; }
 .prompt-tile:hover { border-color: var(--color-accent); }
 .prompt-tile.is-complete { border-color: var(--color-positive); background: var(--color-positive-surface); color: var(--color-positive-text); }
 .prompt-tile.is-complete::after { content: "✓"; position: absolute; top: 0.28rem; right: 0.42rem; font-weight: 600; }
@@ -299,6 +301,11 @@ textarea {
 input { min-height: 3rem; }
 textarea { min-height: 6rem; resize: vertical; }
 #private-note { margin-top: var(--space-3xs); }
+.shared-response-field { margin-top: var(--space-s); padding-top: var(--space-s); border-top: 2px solid var(--color-border); }
+.shared-response-field textarea { min-height: 5rem; }
+.submission-status { margin: var(--space-2xs) 0 0; font-size: var(--text--2); }
+.submission-status.is-success { color: var(--color-positive-text); }
+.danger-link { color: var(--color-error); }
 .field-error { margin: var(--space-3xs) 0 var(--space-xs); color: var(--color-error); font-size: var(--text--2); font-weight: 400; }
 input[aria-invalid="true"] { border-color: var(--color-error-border); }
 .completion-mark { justify-self:center; width: var(--space-xl); height: var(--space-xl); display: grid; place-items: center; margin-bottom: var(--space-xs); border-radius: 50%; border: 2px solid var(--color-positive); background: var(--color-positive-surface); color: var(--color-positive); font-size: var(--text-2); font-weight: 600; }

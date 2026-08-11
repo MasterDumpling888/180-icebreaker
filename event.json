@@ -7,6 +7,12 @@
     "subheader": "Encountering God Daily",
     "introduction": "Pick a card, ask someone at your table, and give each other room to share.",
     "questionCount": 9,
+    "responseCollection": {
+      "enabled": true,
+      "apiBaseUrl": "https://180-icebreaker-api.officers-dashboard.workers.dev",
+      "maxLength": 120,
+      "expiresAt": "2026-09-06T00:00:00+08:00"
+    },
     "placeholderContent": true,
     "messageDiscussionEnabled": false,
     "mix": {

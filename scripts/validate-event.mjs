@@ -8,6 +8,12 @@ const allowedTypes = new Set(["icebreaker", "message_discussion"]);
 if (!event?.id || !event?.title || !/^\d{4}-\d{2}-\d{2}$/.test(event?.date ?? "")) errors.push("Event ID, title, and a YYYY-MM-DD date are required.");
 if (event?.subheader !== undefined && typeof event.subheader !== "string") errors.push("Event subheader must be text when provided.");
 if (!Number.isInteger(event?.questionCount) || event.questionCount < 1) errors.push("questionCount must be a positive integer.");
+if (event?.responseCollection?.enabled) {
+  const collection = event.responseCollection;
+  if (typeof collection.apiBaseUrl !== "string" || !/^https?:\/\//.test(collection.apiBaseUrl)) errors.push("responseCollection.apiBaseUrl must be an HTTP(S) URL.");
+  if (!Number.isInteger(collection.maxLength) || collection.maxLength < 20 || collection.maxLength > 500) errors.push("responseCollection.maxLength must be between 20 and 500.");
+  if (Number.isNaN(Date.parse(collection.expiresAt))) errors.push("responseCollection.expiresAt must be a valid timestamp.");
+}
 if (!Array.isArray(questions)) errors.push("questions must be an array.");
 
 if (Array.isArray(questions)) {

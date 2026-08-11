@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 8000",
+    "dev:api": "npx wrangler dev --config worker/wrangler.jsonc",
+    "db:migrate:local": "npx wrangler d1 migrations apply 180-icebreaker-responses --local --config worker/wrangler.jsonc",
+    "db:migrate:remote": "npx wrangler d1 migrations apply 180-icebreaker-responses --remote --config worker/wrangler.jsonc",
+    "deploy:api": "npx wrangler deploy --config worker/wrangler.jsonc",
     "validate": "node scripts/validate-event.mjs",
-    "test": "npm run validate"
+    "test": "npm run validate && node --check app.js && node --check admin.js && node --test worker/src/index.test.js"
   }
 }
