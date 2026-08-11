@@ -37,6 +37,9 @@ class EventConfiguration {
     if (!event?.id || !event?.title || !event?.date || !Number.isInteger(event.questionCount)) {
       throw new Error("The event details are incomplete.");
     }
+    if (event.subheader !== undefined && typeof event.subheader !== "string") {
+      throw new Error("The event subheader must be text.");
+    }
     if (!Array.isArray(questions)) throw new Error("The question list is missing.");
 
     const active = questions.filter(question => question.active);
@@ -241,6 +244,7 @@ class FamDinnerApp {
         <div class="welcome-heading">
           <p class="event-title">${Html.escape(event.title)}</p>
           <h1>${Html.escape(event.topic)}</h1>
+          ${event.subheader?.trim() ? `<p class="event-subheader">${Html.escape(event.subheader)}</p>` : ""}
         </div>
         <p class="game-label">Human Bingo</p>
         <p class="lede">${Html.escape(event.introduction)}</p>

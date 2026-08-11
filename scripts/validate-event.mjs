@@ -6,6 +6,7 @@ const errors = [];
 const allowedTypes = new Set(["icebreaker", "message_discussion"]);
 
 if (!event?.id || !event?.title || !/^\d{4}-\d{2}-\d{2}$/.test(event?.date ?? "")) errors.push("Event ID, title, and a YYYY-MM-DD date are required.");
+if (event?.subheader !== undefined && typeof event.subheader !== "string") errors.push("Event subheader must be text when provided.");
 if (!Number.isInteger(event?.questionCount) || event.questionCount < 1) errors.push("questionCount must be a positive integer.");
 if (!Array.isArray(questions)) errors.push("questions must be an array.");
 

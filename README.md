@@ -17,7 +17,7 @@ Open `http://localhost:8000`. Do not open `index.html` directly because browsers
 Edit `event.json` and review all event details and questions together:
 
 1. Give every event a new, unique `event.id`. This prevents progress from a previous event appearing in the new event.
-2. Update the title, date, topic, introduction, question count, discussion setting, and mix.
+2. Update the title, date, topic, optional subheader, introduction, question count, discussion setting, and mix.
 3. Replace the complete question list. Every active question needs a unique ID, supported type, text, and display order.
 4. Set `placeholderContent` to `false` only after the ministry team approves all displayed content.
 5. Run `npm test` and preview the full card on a phone before publishing.

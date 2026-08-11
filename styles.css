@@ -361,7 +361,8 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
 .welcome-panel { text-align: center; justify-content: center; }
 .welcome-heading { margin-bottom: var(--space-l-xl); }
 .event-title { margin-bottom: var(--space-3xs); color: var(--color-text-muted); font-size: var(--text-0); }
-.welcome-heading h1 { max-width: 12ch; margin-inline: auto; margin-bottom: var(--space-l); color: var(--color-text); font-size: var(--text-5)}
+.welcome-heading h1 { max-width: 12ch; margin-inline: auto; margin-bottom: var(--space-3xs); color: var(--color-text); font-size: var(--text-5); }
+.event-subheader { margin: 0; color: var(--color-text-muted); font-size: var(--text-1); font-weight: 400; }
 .game-label {
   display: table;
   margin: 0 auto var(--space-xs);
@@ -477,6 +478,7 @@ input[aria-invalid="true"] { border-color: var(--color-error-border); }
 
   .welcome-heading { margin-bottom: var(--space-xs); }
   .event-title { font-size: var(--text--1); }
+  .event-subheader { font-size: var(--text--1); }
   .game-label { margin-bottom: var(--space-2xs); font-size: var(--text--1); }
   .welcome-panel .lede { margin-bottom: var(--space-2xs); font-size: var(--text--1); line-height: 1.3; }
   .welcome-panel .notice { margin: var(--space-2xs) 0; padding: var(--space-2xs); font-size: var(--text--2); line-height: 1.3; }
