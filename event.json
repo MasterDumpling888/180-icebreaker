@@ -10,8 +10,8 @@
     "responseCollection": {
       "enabled": true,
       "apiBaseUrl": "https://180-icebreaker-api.officers-dashboard.workers.dev",
-      "maxLength": 120,
-      "expiresAt": "2026-09-06T00:00:00+08:00"
+      "maxLength": 200,
+      "expiresAt": "2026-09-06T18:00:00.000Z"
     },
     "placeholderContent": true,
     "messageDiscussionEnabled": false,
