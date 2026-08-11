@@ -159,7 +159,7 @@ class ResultsDashboard {
     const counts = this.responses.reduce((result, response) => ({ ...result, [response.status]: (result[response.status] ?? 0) + 1 }), {});
     this.root.innerHTML = `<section class="panel admin-panel">
       <header class="admin-header">
-        <div><p class="eyebrow">${Html.escape(this.config.event.title)}</p><h1>Anonymous results</h1><p>${Html.escape(this.config.event.topic)} · responses expire ${new Date(this.config.event.responseCollection.expiresAt).toLocaleString("en-PH", { timeZone: "Asia/Manila" })}</p></div>
+        <div><p class="eyebrow">${Html.escape(this.config.event.title)}</p><h1>Attendee results</h1><p>${Html.escape(this.config.event.topic)} · responses expire ${new Date(this.config.event.responseCollection.expiresAt).toLocaleString("en-PH", { timeZone: "Asia/Manila" })}</p></div>
         <div class="dashboard-actions">
           <button class="button button-secondary" data-action="refresh">Refresh</button>
           <button class="button button-secondary" data-action="approve-all">Approve all pending</button>
